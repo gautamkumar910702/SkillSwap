@@ -1,0 +1,390 @@
+
+.sessions-page {
+  width: 100%;
+  padding: 28px;
+  color: var(--text-primary, #172033);
+}
+
+.sessions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.sessions-eyebrow {
+  margin: 0 0 8px;
+  color: #6478e8;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.sessions-header h1 {
+  margin: 0;
+  font-size: clamp(25px, 3vw, 34px);
+  font-weight: 800;
+}
+
+.sessions-subtitle {
+  margin: 9px 0 0;
+  color: #788197;
+  line-height: 1.6;
+}
+
+.sessions-refresh {
+  padding: 10px 17px;
+  border: 1px solid #dce1ed;
+  border-radius: 10px;
+  background: white;
+  color: #29334a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sessions-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sessions-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 34px;
+}
+
+.sessions-stat {
+  padding: 20px;
+  border: 1px solid #e9edf5;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 5px 20px rgba(30, 45, 80, 0.035);
+}
+
+.sessions-stat span,
+.session-details span {
+  display: block;
+  margin-bottom: 9px;
+  color: #788197;
+  font-size: 13px;
+}
+
+.sessions-stat strong {
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.sessions-list-section h2 {
+  margin: 0 0 18px;
+  font-size: 22px;
+}
+
+.sessions-list {
+  display: grid;
+  gap: 18px;
+}
+
+.session-card {
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid #e7ebf4;
+  border-radius: 17px;
+  background: white;
+  box-shadow: 0 5px 22px rgba(30, 45, 80, 0.035);
+}
+
+.session-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.session-avatar {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 15px;
+  background: #edf0ff;
+  color: #596ce0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.session-person {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-person h3 {
+  margin: 0 0 5px;
+  font-size: 17px;
+}
+
+.session-person p {
+  margin: 0;
+  color: #7c8498;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.session-status {
+  padding: 7px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.status-scheduled {
+  background: #fff4dc;
+  color: #996400;
+}
+
+.status-completed {
+  background: #e4f8ed;
+  color: #16794a;
+}
+
+.status-cancelled {
+  background: #ffebeb;
+  color: #b83232;
+}
+
+.session-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 23px;
+  padding: 17px 0;
+  border-top: 1px solid #edf0f6;
+  border-bottom: 1px solid #edf0f6;
+}
+
+.session-details strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.session-actions {
+  margin-top: 18px;
+}
+
+.session-primary-button {
+  padding: 11px 17px;
+  border: 0;
+  border-radius: 10px;
+  background: #596ce0;
+  color: white;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.session-primary-button:hover {
+  background: #4658c7;
+}
+
+.session-primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.session-hint {
+  margin: 10px 0 0;
+  color: #7c8498;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.session-review-area {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #e6eaff;
+  border-radius: 14px;
+  background: #fafbff;
+}
+
+.session-review-area h4 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.session-review-subtitle {
+  margin: 7px 0 14px;
+  color: #788197;
+  font-size: 13px;
+}
+
+.session-stars {
+  display: flex;
+  gap: 7px;
+  margin: 10px 0 20px;
+}
+
+.session-star {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #d4d9e5;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.session-star.selected {
+  color: #f2b544;
+}
+
+.session-star:focus-visible {
+  outline: 2px solid #596ce0;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.session-comment-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.session-review-area textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #dfe4ef;
+  border-radius: 10px;
+  background: white;
+  color: #172033;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.session-review-area textarea:focus {
+  outline: 2px solid #dce2ff;
+  border-color: #8492ec;
+}
+
+.session-review-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.session-review-footer span {
+  color: #788197;
+  font-size: 12px;
+}
+
+.session-reviewed {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #16794a;
+  font-weight: 700;
+}
+
+.session-reviewed span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e4f8ed;
+}
+
+.sessions-empty {
+  padding: 44px 20px;
+  border: 1px dashed #d9dfec;
+  border-radius: 16px;
+  background: white;
+  text-align: center;
+}
+
+.sessions-empty-icon {
+  font-size: 35px;
+}
+
+.sessions-empty h3 {
+  margin: 12px 0 7px;
+}
+
+.sessions-empty p {
+  max-width: 440px;
+  margin: 0 auto;
+  color: #788197;
+  line-height: 1.6;
+}
+
+.sessions-loading {
+  padding: 30px;
+  color: #788197;
+}
+
+.sessions-alert {
+  margin-bottom: 18px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+
+.sessions-alert-error {
+  background: #ffeded;
+  color: #a52626;
+}
+
+.sessions-alert-success {
+  background: #e8f8ee;
+  color: #176a40;
+}
+
+@media (max-width: 760px) {
+  .sessions-page {
+    padding: 18px;
+  }
+
+  .sessions-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sessions-header {
+    align-items: flex-start;
+  }
+
+  .session-card {
+    padding: 17px;
+  }
+}
+
+@media (max-width: 460px) {
+  .sessions-header {
+    flex-direction: column;
+  }
+
+  .session-card-top {
+    flex-wrap: wrap;
+  }
+
+  .session-status {
+    margin-left: auto;
+  }
+
+  .session-details {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .session-review-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,91 @@
+
+/* =========================================
+   SkillSwap - Reusable Button Component
+========================================= */
+
+.custom-button {
+  min-height: 44px;
+  padding: 12px 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Primary action button */
+.custom-button-primary {
+  background-color: #5b4bdb;
+  color: #ffffff;
+}
+
+.custom-button-primary:hover:not(:disabled) {
+  background-color: #4938c6;
+  transform: translateY(-1px);
+}
+
+/* Secondary action button */
+.custom-button-secondary {
+  border-color: #deddf0;
+  background-color: #ffffff;
+  color: #292943;
+}
+
+.custom-button-secondary:hover:not(:disabled) {
+  border-color: #c9c4fa;
+  background-color: #f0efff;
+}
+
+/* Keyboard accessibility */
+.custom-button:focus-visible {
+  outline: 3px solid #a9a0ff;
+  outline-offset: 3px;
+}
+
+/* Disabled button */
+.custom-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Mobile screens */
+@media (max-width: 640px) {
+  .custom-button {
+    min-height: 44px;
+    padding: 12px 18px;
+    font-size: 14px;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 380px) {
+  .custom-button {
+    padding: 11px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .custom-button {
+    transition: none;
+  }
+}

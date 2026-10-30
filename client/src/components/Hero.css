@@ -1,0 +1,512 @@
+
+/* =========================================
+   SkillSwap - Hero Component
+   Responsive for mobile, tablet and desktop
+========================================= */
+
+.hero-section {
+  width: 100%;
+  max-width: 1440px;
+  min-height: 620px;
+  margin: 0 auto;
+  padding: 84px 7%;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(36px, 5vw, 76px);
+
+  background:
+    radial-gradient(ellipse at 85% 45%, #eeebff 0%, transparent 48%),
+    #f6f7fb;
+}
+
+/* ===== Hero text ===== */
+
+.hero-content {
+  width: 100%;
+  max-width: 610px;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 9px 13px;
+  border: 1px solid #e3defe;
+  border-radius: 999px;
+  background-color: #ffffff;
+
+  color: #5b4bdb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  line-height: 1.4;
+}
+
+.hero-eyebrow-dot,
+.hero-caption-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #16a37a;
+}
+
+.hero-content h1 {
+  margin: 26px 0 20px;
+
+  color: #17172b;
+  font-size: clamp(42px, 5.2vw, 68px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -2.8px;
+}
+
+.hero-content h1 span {
+  color: #5b4bdb;
+}
+
+.hero-description {
+  max-width: 520px;
+  margin: 0;
+
+  color: #66667b;
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+/* ===== Hero actions ===== */
+
+.hero-actions {
+  margin-top: 30px;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.hero-primary-button {
+  min-height: 50px;
+  padding: 14px 23px;
+  gap: 12px;
+  box-shadow: 0 8px 20px rgb(91 75 219 / 18%);
+}
+
+.hero-primary-button:hover {
+  box-shadow: 0 10px 25px rgb(91 75 219 / 24%);
+}
+
+.hero-login-link {
+  color: #66667b;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.hero-login-link span {
+  color: #5b4bdb;
+  font-weight: 800;
+}
+
+.hero-login-link:hover span {
+  text-decoration: underline;
+}
+
+.hero-trust-note {
+  margin-top: 28px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-trust-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background-color: #e0f5ed;
+  color: #12805e;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.hero-trust-note p {
+  margin: 0;
+  color: #77778a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ===== Hero illustration ===== */
+
+.hero-visual {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  max-width: 510px;
+  min-height: 400px;
+  margin: 0 auto;
+  padding: 70px 24px 50px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+
+  border: 1px solid #e7e3ff;
+  border-radius: 30px;
+  background: linear-gradient(145deg, #efedff 0%, #ffffff 78%);
+  box-shadow: 0 25px 70px rgb(39 29 104 / 7%);
+  overflow: hidden;
+}
+
+.hero-visual-decoration {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-decoration-one {
+  top: -75px;
+  right: -55px;
+  width: 210px;
+  height: 210px;
+  background-color: rgb(91 75 219 / 7%);
+}
+
+.hero-decoration-two {
+  bottom: -95px;
+  left: -65px;
+  width: 220px;
+  height: 220px;
+  background-color: rgb(22 163 122 / 7%);
+}
+
+/* Floating label */
+.hero-floating-label {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border: 1px solid #eceaf7;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: #55556b;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgb(23 23 43 / 5%);
+}
+
+.hero-floating-label span {
+  color: #e6a23c;
+  font-size: 16px;
+}
+
+/* Skill cards */
+.hero-skill-card {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 365px;
+  min-width: 0;
+  padding: 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  border: 1px solid #eeedf7;
+  border-radius: 18px;
+  background-color: #ffffff;
+  box-shadow: 0 12px 32px rgb(38 31 91 / 7%);
+}
+
+.hero-skill-card-top {
+  align-self: flex-start;
+}
+
+.hero-skill-card-bottom {
+  align-self: flex-end;
+}
+
+.hero-skill-icon {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.hero-design-icon {
+  background-color: #f0edff;
+  color: #5b4bdb;
+}
+
+.hero-code-icon {
+  background-color: #e4f7ef;
+  color: #168b67;
+  font-size: 20px;
+}
+
+.hero-skill-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.hero-skill-category {
+  display: block;
+  margin-bottom: 5px;
+
+  color: #85849a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+.hero-skill-info h3 {
+  margin: 0 0 5px;
+  color: #24243c;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.hero-skill-info p {
+  margin: 0;
+  color: #77778a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.hero-skill-arrow {
+  flex-shrink: 0;
+  align-self: flex-start;
+  color: #9b96c7;
+  font-size: 18px;
+}
+
+/* Exchange symbol between cards */
+.hero-exchange-symbol {
+  position: relative;
+  z-index: 2;
+
+  width: 58px;
+  height: 58px;
+  margin: -5px 0;
+
+  display: grid;
+  place-items: center;
+  border: 5px solid #f5f3ff;
+  border-radius: 50%;
+  background-color: #5b4bdb;
+  color: #ffffff;
+
+  font-size: 31px;
+  box-shadow: 0 8px 22px rgb(91 75 219 / 25%);
+}
+
+.hero-visual-caption {
+  position: absolute;
+  bottom: 18px;
+  left: 22px;
+  right: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hero-visual-caption p {
+  margin: 0;
+  color: #77778a;
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ===== Tablet ===== */
+
+@media (max-width: 1000px) {
+  .hero-section {
+    min-height: auto;
+    padding: 70px 5%;
+    gap: 35px;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(40px, 5.5vw, 56px);
+    letter-spacing: -2px;
+  }
+
+  .hero-description {
+    font-size: 15px;
+  }
+
+  .hero-visual {
+    min-height: 370px;
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .hero-skill-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .hero-skill-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 23px;
+  }
+}
+
+/* ===== Mobile ===== */
+
+@media (max-width: 700px) {
+  .hero-section {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 55px 6% 48px;
+    gap: 42px;
+  }
+
+  .hero-content {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-content h1 {
+    margin: 22px 0 18px;
+    font-size: clamp(38px, 9vw, 54px);
+    letter-spacing: -1.8px;
+  }
+
+  .hero-description {
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .hero-actions {
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .hero-trust-note {
+    justify-content: center;
+  }
+
+  .hero-visual {
+    max-width: 480px;
+    min-height: 365px;
+    padding: 65px 20px 48px;
+  }
+}
+
+/* ===== Small phones ===== */
+
+@media (max-width: 400px) {
+  .hero-section {
+    padding: 42px 16px;
+    gap: 34px;
+  }
+
+  .hero-eyebrow {
+    padding: 8px 10px;
+    font-size: 9px;
+    letter-spacing: 0.7px;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(34px, 9.5vw, 39px);
+    letter-spacing: -1.3px;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .hero-primary-button {
+    width: 100%;
+  }
+
+  .hero-visual {
+    min-height: 340px;
+    padding: 65px 12px 46px;
+    border-radius: 22px;
+  }
+
+  .hero-floating-label {
+    top: 16px;
+    right: 12px;
+    font-size: 9px;
+  }
+
+  .hero-skill-card {
+    padding: 12px;
+    gap: 9px;
+  }
+
+  .hero-skill-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    font-size: 20px;
+  }
+
+  .hero-skill-info h3 {
+    font-size: 13px;
+  }
+
+  .hero-skill-info p {
+    font-size: 10px;
+  }
+
+  .hero-exchange-symbol {
+    width: 50px;
+    height: 50px;
+    font-size: 26px;
+  }
+
+  .hero-visual-caption {
+    right: 10px;
+    left: 10px;
+  }
+
+  .hero-visual-caption p {
+    font-size: 10px;
+  }
+}
+
+/* Accessibility: respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .hero-primary-button {
+    transition: none;
+  }
+}

@@ -1,0 +1,257 @@
+
+/* ========================================
+   SkillSwap - How It Works Section
+======================================== */
+
+.how-it-works-section {
+  width: 100%;
+  padding: 88px 7%;
+  background-color: #f6f7fb;
+}
+
+.how-it-works-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Section heading */
+
+.how-it-works-heading {
+  max-width: 720px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.how-it-works-eyebrow {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: #5b4bdb;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.how-it-works-heading h2 {
+  margin: 0 0 18px;
+  color: #17172b;
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -1.2px;
+}
+
+.how-it-works-heading h2 span {
+  color: #5b4bdb;
+}
+
+.how-it-works-heading > p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: #66667b;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* Three steps */
+
+.how-it-works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.how-step-card {
+  min-width: 0;
+  padding: 30px 26px;
+  border: 1px solid #e9e8f3;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 28px rgb(36 31 94 / 4%);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.how-step-card:hover {
+  transform: translateY(-5px);
+  border-color: #d8d2ff;
+  box-shadow: 0 16px 34px rgb(36 31 94 / 8%);
+}
+
+.how-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.how-step-number {
+  color: #5b4bdb;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.how-step-icon {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background-color: #f0edff;
+  font-size: 25px;
+}
+
+.how-step-card:nth-child(2) .how-step-icon {
+  background-color: #e7f8f0;
+}
+
+.how-step-card:nth-child(3) .how-step-icon {
+  background-color: #fff1e5;
+}
+
+.how-step-card h3 {
+  margin: 0 0 12px;
+  color: #24243c;
+  font-size: 19px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.how-step-card > p {
+  margin: 0;
+  color: #737389;
+  font-size: 14px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+/* Bottom call to action */
+
+.how-it-works-cta {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  text-align: center;
+}
+
+.how-it-works-cta > p {
+  margin: 0;
+  color: #42425b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+  .how-it-works-section {
+    padding: 76px 5%;
+  }
+
+  .how-it-works-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .how-step-card {
+    padding: 26px 22px;
+  }
+
+  .how-step-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .how-it-works-section {
+    padding: 58px 5%;
+  }
+
+  .how-it-works-heading {
+    margin-bottom: 32px;
+  }
+
+  .how-it-works-heading h2 {
+    font-size: clamp(28px, 7vw, 36px);
+    letter-spacing: -0.8px;
+  }
+
+  .how-it-works-heading > p {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .how-it-works-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .how-step-card,
+  .how-step-card:last-child {
+    grid-column: auto;
+    padding: 24px;
+  }
+
+  .how-step-top {
+    margin-bottom: 22px;
+  }
+
+  .how-step-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 23px;
+  }
+
+  .how-step-card h3 {
+    font-size: 18px;
+  }
+
+  .how-step-card > p {
+    font-size: 14px;
+  }
+
+  .how-it-works-cta {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* Small phones */
+
+@media (max-width: 360px) {
+  .how-it-works-section {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .how-it-works-heading h2 {
+    font-size: 27px;
+  }
+
+  .how-step-card,
+  .how-step-card:last-child {
+    padding: 20px;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .how-step-card {
+    transition: none;
+  }
+
+  .how-step-card:hover {
+    transform: none;
+  }
+}

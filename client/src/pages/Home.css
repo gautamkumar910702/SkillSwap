@@ -1,0 +1,45 @@
+
+/* ========================================
+   SkillSwap - Landing Page
+======================================== */
+
+.home-page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  overflow-x: clip;
+  background-color: #f6f7fb;
+  color: #17172b;
+}
+
+.home-page main {
+  width: 100%;
+  min-width: 0;
+}
+
+.home-page main > section {
+  scroll-margin-top: 90px;
+}
+
+/* Consistent text rendering */
+
+.home-page h1,
+.home-page h2,
+.home-page h3,
+.home-page p {
+  overflow-wrap: break-word;
+}
+
+/* Responsive safeguards */
+
+.home-page *,
+.home-page *::before,
+.home-page *::after {
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .home-page main > section {
+    scroll-margin-top: 76px;
+  }
+}

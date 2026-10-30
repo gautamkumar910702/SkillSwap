@@ -1,0 +1,102 @@
+
+/* =========================================
+   SkillSwap - Footer Component
+========================================= */
+
+.site-footer {
+  width: 100%;
+  padding: 32px 7% 20px;
+  background-color: #ffffff;
+  border-top: 1px solid #e8e8f0;
+  color: #17172b;
+}
+
+/* Footer brand */
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 24px;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.footer-brand-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background-color: #5b4bdb;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.footer-tagline {
+  margin: 0;
+  color: #66667b;
+  font-size: 14px;
+}
+
+/* Copyright row */
+.footer-bottom {
+  padding-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #eeeeF5;
+}
+
+.footer-bottom p {
+  margin: 0;
+  color: #77778a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Tablet screens */
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 28px 5% 18px;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 520px) {
+  .footer-content {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-brand {
+    font-size: 18px;
+  }
+
+  .footer-tagline,
+  .footer-bottom p {
+    font-size: 12px;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 360px) {
+  .site-footer {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}

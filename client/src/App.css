@@ -1,0 +1,36 @@
+
+/* =========================================
+   SkillSwap - Application-Level Styles
+========================================= */
+
+/* Keep the main app at least as tall as the screen. */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Shared page for invalid routes. */
+.not-found {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #f6f7fb;
+  color: #17172b;
+}
+
+.not-found h1 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 5vw, 42px);
+}
+
+.not-found p {
+  margin: 0;
+  color: #66667b;
+  font-size: 16px;
+  line-height: 1.7;
+}

@@ -1,0 +1,82 @@
+
+/* ========================================
+   SkillSwap - Register Page
+======================================== */
+
+.register-page {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+.register-card {
+  max-width: 490px;
+}
+
+.register-card .auth-brand {
+  margin-bottom: 26px;
+}
+
+.register-card .auth-heading {
+  margin-bottom: 24px;
+}
+
+.register-form {
+  gap: 18px;
+}
+
+.register-form .auth-field > label {
+  margin-bottom: 8px;
+}
+
+.register-form .auth-field input {
+  min-height: 46px;
+}
+
+.register-form .auth-submit {
+  margin-top: 4px;
+}
+
+.register-card .auth-switch {
+  margin-top: 22px;
+}
+
+.register-card .auth-back-link {
+  margin-top: 16px;
+}
+
+/* Tablet and mobile */
+
+@media (max-width: 520px) {
+  .register-page {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .register-card {
+    padding: 28px 24px;
+  }
+
+  .register-card .auth-brand {
+    margin-bottom: 24px;
+  }
+
+  .register-card .auth-heading {
+    margin-bottom: 22px;
+  }
+
+  .register-form {
+    gap: 17px;
+  }
+}
+
+/* Small phones */
+
+@media (max-width: 360px) {
+  .register-page {
+    padding: 12px;
+  }
+
+  .register-card {
+    padding: 24px 18px;
+  }
+}
