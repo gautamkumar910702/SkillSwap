@@ -25,35 +25,59 @@ const server = http.createServer(app);
 
 const PORT = process.env.PORT || 5000;
 
-// Allowed frontend origins
+// -----------------------------------------
+// CORS CONFIGURATION
+// -----------------------------------------
+
 const allowedOrigins = [
-  process.env.CLIENT_URL || "http://localhost:5173",
+  process.env.CLIENT_URL,
+  "https://skill-swap-green-psi.vercel.app",
+  "https://skill-swap-ai-mock-interview.vercel.app",
+  "https://skill-swap-git-main-ai-mock-interview.vercel.app",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
-];
+].filter(Boolean);
 
-// Middleware
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+// Validate frontend origin
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
 
-      console.warn("CORS blocked origin:", origin);
-      return callback(new Error("Origin not allowed by CORS."));
-    },
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 204,
-  }),
-);
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+
+  // Allow SkillSwap Vercel preview deployments
+  return /^https:\/\/skill-swap-[a-z0-9-]+\.vercel\.app$/i.test(origin);
+}
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
+
+    console.warn("CORS blocked origin:", origin);
+    return callback(new Error("Origin not allowed by CORS."));
+  },
+
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
+  allowedHeaders: ["Content-Type", "Authorization"],
+
+  optionsSuccessStatus: 204,
+};
+
+// Apply CORS before API routes
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "10kb" }));
 
-// Health check
+// -----------------------------------------
+// HEALTH CHECK
+// -----------------------------------------
+
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -61,7 +85,10 @@ app.get("/", (req, res) => {
   });
 });
 
-// API routes
+// -----------------------------------------
+// API ROUTES
+// -----------------------------------------
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/exchanges", exchangeRoutes);
@@ -80,18 +107,24 @@ const wss = new WebSocketServer({
   maxPayload: 10 * 1024,
 });
 
-// Store active WebSocket connections and exchanges watched by each user.
+// Store active WebSocket connections
 const onlineUsers = new Map();
 const userWatchedExchanges = new Map();
 
-// Send JSON response
+// -----------------------------------------
+// SEND WEBSOCKET JSON RESPONSE
+// -----------------------------------------
+
 function sendWS(ws, data) {
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(data));
   }
 }
 
-// Verify accepted exchange and user membership
+// -----------------------------------------
+// VERIFY ACCEPTED EXCHANGE
+// -----------------------------------------
+
 async function verifyChatAccess(exchangeId, userId) {
   if (!mongoose.isValidObjectId(exchangeId)) {
     return null;
@@ -104,7 +137,10 @@ async function verifyChatAccess(exchangeId, userId) {
   });
 }
 
-// Register connected user
+// -----------------------------------------
+// REGISTER CONNECTED USER
+// -----------------------------------------
+
 function registerUser(userId, ws) {
   const connections = onlineUsers.get(userId) || new Set();
 
@@ -112,7 +148,10 @@ function registerUser(userId, ws) {
   onlineUsers.set(userId, connections);
 }
 
-// Remove disconnected user
+// -----------------------------------------
+// REMOVE DISCONNECTED USER
+// -----------------------------------------
+
 function removeUser(userId, ws) {
   if (!userId) return;
 
@@ -127,7 +166,10 @@ function removeUser(userId, ws) {
   }
 }
 
-// Deliver message to user's active connections
+// -----------------------------------------
+// DELIVER MESSAGE TO USER
+// -----------------------------------------
+
 function deliverMessage(userId, data) {
   const connections = onlineUsers.get(userId);
 
@@ -138,7 +180,10 @@ function deliverMessage(userId, data) {
   }
 }
 
-// Notify the other participant about a user's chat presence.
+// -----------------------------------------
+// NOTIFY PARTNER PRESENCE
+// -----------------------------------------
+
 async function notifyPartnerPresence(exchangeId, userId, status) {
   const exchange = await verifyChatAccess(exchangeId, userId);
 
@@ -167,18 +212,20 @@ async function notifyPartnerPresence(exchangeId, userId, status) {
   }
 }
 
-// WebSocket connection
+// -----------------------------------------
+// WEBSOCKET CONNECTION
+// -----------------------------------------
+
 wss.on("connection", (ws, request) => {
   let authenticatedUser = null;
   let authTimeout;
 
-  // Exchanges this connection is currently watching for presence updates.
   ws.watchedExchanges = new Set();
 
   // Validate browser origin
   const origin = request.headers.origin;
 
-  if (origin && !allowedOrigins.includes(origin)) {
+  if (!isAllowedOrigin(origin)) {
     ws.close(1008, "Origin not allowed");
     return;
   }
@@ -196,6 +243,10 @@ wss.on("connection", (ws, request) => {
       ws.close(1008, "Authentication required");
     }
   }, 10000);
+
+  // -----------------------------------------
+  // HANDLE WEBSOCKET MESSAGES
+  // -----------------------------------------
 
   ws.on("message", async (rawMessage) => {
     try {
@@ -233,6 +284,7 @@ wss.on("connection", (ws, request) => {
         authenticatedUser = user._id.toString();
 
         clearTimeout(authTimeout);
+
         registerUser(authenticatedUser, ws);
 
         sendWS(ws, {
@@ -242,6 +294,7 @@ wss.on("connection", (ws, request) => {
         });
 
         console.log("Authenticated user:", authenticatedUser);
+
         return;
       }
 
@@ -249,7 +302,7 @@ wss.on("connection", (ws, request) => {
       // STEP 2: HANDLE CHAT EVENTS
       // ---------------------------------
 
-      // Subscribe this connection to presence updates for an accepted exchange.
+      // WATCH CHAT
       if (payload.type === "WATCH_CHAT") {
         const { exchangeId } = payload;
 
@@ -261,6 +314,7 @@ wss.on("connection", (ws, request) => {
             type: "ERROR",
             message: "Invalid exchange request ID.",
           });
+
           return;
         }
 
@@ -271,6 +325,7 @@ wss.on("connection", (ws, request) => {
             type: "ERROR",
             message: "Chat access is allowed only for accepted exchanges.",
           });
+
           return;
         }
 
@@ -280,6 +335,7 @@ wss.on("connection", (ws, request) => {
           userWatchedExchanges.get(authenticatedUser) || new Set();
 
         watchedByUser.add(exchangeId);
+
         userWatchedExchanges.set(authenticatedUser, watchedByUser);
 
         const partnerId =
@@ -287,7 +343,7 @@ wss.on("connection", (ws, request) => {
             ? exchange.receiver.toString()
             : exchange.sender.toString();
 
-        // Send the partner's current presence to this connection.
+        // Send partner current presence
         sendWS(ws, {
           type: "PRESENCE_UPDATE",
           exchangeId,
@@ -295,13 +351,16 @@ wss.on("connection", (ws, request) => {
           status: onlineUsers.has(partnerId) ? "online" : "offline",
         });
 
-        // Tell the partner that this user has opened the chat.
+        // Notify partner
         await notifyPartnerPresence(exchangeId, authenticatedUser, "online");
 
         return;
       }
 
-      // Mark received messages as read and notify the original sender.
+      // ---------------------------------
+      // MARK MESSAGES AS READ
+      // ---------------------------------
+
       if (payload.type === "MARK_READ") {
         const { exchangeId } = payload;
 
@@ -313,6 +372,7 @@ wss.on("connection", (ws, request) => {
             type: "ERROR",
             message: "Invalid exchange request ID.",
           });
+
           return;
         }
 
@@ -323,6 +383,7 @@ wss.on("connection", (ws, request) => {
             type: "ERROR",
             message: "Chat access is allowed only for accepted exchanges.",
           });
+
           return;
         }
 
@@ -362,12 +423,16 @@ wss.on("connection", (ws, request) => {
         return;
       }
 
-      // SEND_MESSAGE: Existing message functionality.
+      // ---------------------------------
+      // SEND MESSAGE
+      // ---------------------------------
+
       if (payload.type !== "SEND_MESSAGE") {
         sendWS(ws, {
           type: "ERROR",
           message: "Unsupported WebSocket event.",
         });
+
         return;
       }
 
@@ -381,6 +446,7 @@ wss.on("connection", (ws, request) => {
           type: "ERROR",
           message: "Invalid exchange request ID.",
         });
+
         return;
       }
 
@@ -389,6 +455,7 @@ wss.on("connection", (ws, request) => {
           type: "ERROR",
           message: "Message must be text.",
         });
+
         return;
       }
 
@@ -399,11 +466,12 @@ wss.on("connection", (ws, request) => {
           type: "ERROR",
           message: "Message must contain 1 to 2000 characters.",
         });
+
         return;
       }
 
       // ---------------------------------
-      // STEP 3: VERIFY ACCEPTED EXCHANGE
+      // VERIFY ACCEPTED EXCHANGE
       // ---------------------------------
 
       const exchange = await verifyChatAccess(exchangeId, authenticatedUser);
@@ -413,10 +481,11 @@ wss.on("connection", (ws, request) => {
           type: "ERROR",
           message: "Chat is allowed only for accepted exchanges.",
         });
+
         return;
       }
 
-      // Determine receiver using database IDs
+      // Determine receiver
       const senderId = authenticatedUser;
 
       const receiverId =
@@ -425,7 +494,7 @@ wss.on("connection", (ws, request) => {
           : exchange.sender.toString();
 
       // ---------------------------------
-      // STEP 4: SAVE MESSAGE
+      // SAVE MESSAGE
       // ---------------------------------
 
       const savedMessage = await Message.create({
@@ -449,7 +518,7 @@ wss.on("connection", (ws, request) => {
       // Deliver message to receiver
       deliverMessage(receiverId, messageData);
 
-      // Confirm to sender and other sender devices
+      // Confirm to sender
       deliverMessage(senderId, messageData);
     } catch (error) {
       console.error("WebSocket error:", error.message);
@@ -475,9 +544,9 @@ wss.on("connection", (ws, request) => {
     }
   });
 
-  // ---------------------------------
+  // -----------------------------------------
   // HANDLE DISCONNECTION
-  // ---------------------------------
+  // -----------------------------------------
 
   ws.on("close", () => {
     clearTimeout(authTimeout);
@@ -485,7 +554,7 @@ wss.on("connection", (ws, request) => {
     if (authenticatedUser) {
       removeUser(authenticatedUser, ws);
 
-      // Keep the user online while any tab/device remains connected.
+      // Keep user online while another connection exists
       if (!onlineUsers.has(authenticatedUser)) {
         const watchedExchanges =
           userWatchedExchanges.get(authenticatedUser) || new Set();
