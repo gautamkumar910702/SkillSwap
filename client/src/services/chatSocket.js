@@ -1,4 +1,8 @@
-const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:5000/ws";
+const WS_URL =
+  import.meta.env.VITE_WS_URL ||
+  (import.meta.env.PROD
+    ? "wss://skillswap-210h.onrender.com/ws"
+    : "ws://localhost:5000/ws");
 
 class ChatSocket {
   constructor() {
@@ -50,7 +54,12 @@ class ChatSocket {
       }, 12000);
 
       socket.onopen = () => {
-        socket.send(JSON.stringify({ type: "AUTH", token }));
+        socket.send(
+          JSON.stringify({
+            type: "AUTH",
+            token,
+          }),
+        );
       };
 
       socket.onmessage = (event) => {
@@ -75,6 +84,7 @@ class ChatSocket {
 
         if (data.type === "ERROR" && !authenticated) {
           fail(data.message || "Chat authentication failed.");
+
           socket.close();
         }
 
