@@ -12,6 +12,10 @@ class ChatSocket {
     this.connectingPromise = null;
   }
 
+  // -----------------------------------------
+  // CONNECT AND AUTHENTICATE
+  // -----------------------------------------
+
   connect() {
     if (this.socket?.readyState === WebSocket.OPEN && this.authenticated) {
       return Promise.resolve();
@@ -84,13 +88,19 @@ class ChatSocket {
 
         if (data.type === "ERROR" && !authenticated) {
           fail(data.message || "Chat authentication failed.");
-
           socket.close();
         }
 
+        // Notify all registered listeners.
         this.listeners.forEach((callbacks, type) => {
           if (type === data.type) {
-            callbacks.forEach((callback) => callback(data));
+            callbacks.forEach((callback) => {
+              try {
+                callback(data);
+              } catch (error) {
+                console.error("WebSocket listener error:", error);
+              }
+            });
           }
         });
       };
@@ -113,7 +123,11 @@ class ChatSocket {
 
         this.listeners.forEach((callbacks) => {
           callbacks.forEach((callback) => {
-            callback({ type: "DISCONNECTED" });
+            try {
+              callback({ type: "DISCONNECTED" });
+            } catch (error) {
+              console.error("WebSocket listener error:", error);
+            }
           });
         });
       };
@@ -124,7 +138,10 @@ class ChatSocket {
     return this.connectingPromise;
   }
 
-  // Send a chat message
+  // -----------------------------------------
+  // CHAT METHODS
+  // -----------------------------------------
+
   sendMessage(exchangeId, content) {
     this.send({
       type: "SEND_MESSAGE",
@@ -133,7 +150,6 @@ class ChatSocket {
     });
   }
 
-  // Subscribe to partner online/offline status
   watchChat(exchangeId) {
     this.send({
       type: "WATCH_CHAT",
@@ -141,7 +157,6 @@ class ChatSocket {
     });
   }
 
-  // Mark received messages as read
   markRead(exchangeId) {
     this.send({
       type: "MARK_READ",
@@ -149,7 +164,55 @@ class ChatSocket {
     });
   }
 
-  // Common WebSocket sender
+  // -----------------------------------------
+  // CALL METHODS
+  // -----------------------------------------
+
+  // Start an outgoing call.
+  startCall(exchangeId, callId) {
+    this.send({
+      type: "CALL_START",
+      exchangeId,
+      callId,
+    });
+  }
+
+  // Accept an incoming call.
+  acceptCall(callId) {
+    this.send({
+      type: "CALL_ACCEPT",
+      callId,
+    });
+  }
+
+  // Reject an incoming call.
+  rejectCall(callId) {
+    this.send({
+      type: "CALL_REJECT",
+      callId,
+    });
+  }
+
+  // Cancel an outgoing call.
+  cancelCall(callId) {
+    this.send({
+      type: "CALL_CANCEL",
+      callId,
+    });
+  }
+
+  // End an accepted call.
+  endCall(callId) {
+    this.send({
+      type: "CALL_END",
+      callId,
+    });
+  }
+
+  // -----------------------------------------
+  // COMMON WEBSOCKET SENDER
+  // -----------------------------------------
+
   send(data) {
     if (
       !this.socket ||
@@ -162,7 +225,10 @@ class ChatSocket {
     this.socket.send(JSON.stringify(data));
   }
 
-  // Register event listener
+  // -----------------------------------------
+  // EVENT LISTENERS
+  // -----------------------------------------
+
   on(type, callback) {
     if (!this.listeners.has(type)) {
       this.listeners.set(type, new Set());
@@ -173,7 +239,6 @@ class ChatSocket {
     return () => this.off(type, callback);
   }
 
-  // Remove event listener
   off(type, callback) {
     const callbacks = this.listeners.get(type);
 
@@ -186,7 +251,10 @@ class ChatSocket {
     }
   }
 
-  // Disconnect WebSocket
+  // -----------------------------------------
+  // DISCONNECT
+  // -----------------------------------------
+
   disconnect() {
     const socket = this.socket;
 

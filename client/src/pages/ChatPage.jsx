@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 import chatSocket from "../services/chatSocket";
+import { useCall } from "../components/CallProvider";
 import "./ChatPage.css";
 
 function getCurrentUserId() {
@@ -23,6 +24,7 @@ function getCurrentUserId() {
 function ChatPage() {
   const { exchangeId } = useParams();
   const navigate = useNavigate();
+  const { setOutgoingCall } = useCall();
 
   const currentUserId = getCurrentUserId();
 
@@ -216,6 +218,12 @@ function ChatPage() {
       }
     };
 
+    const handleCallError = (data) => {
+      if (!active) return;
+      setOutgoingCall(null);
+      setSocketError(data.message || "Unable to start the call.");
+    };
+
     const handleDisconnect = () => {
       if (active) {
         setConnected(false);
@@ -247,6 +255,11 @@ function ChatPage() {
     const unsubscribeDisconnect = chatSocket.on(
       "DISCONNECTED",
       handleDisconnect
+    );
+
+    const unsubscribeCallError = chatSocket.on(
+      "CALL_ERROR",
+      handleCallError
     );
 
     const connectAndWatch = () => {
@@ -283,14 +296,52 @@ function ChatPage() {
       unsubscribeRead();
       unsubscribeError();
       unsubscribeDisconnect();
-      chatSocket.disconnect();
+      unsubscribeCallError();
+
+      // Do not disconnect here.
+      // CallProvider manages the shared WebSocket connection.
     };
-  }, [exchangeId, currentUserId]);
+  }, [exchangeId, currentUserId, setOutgoingCall]);
 
   // Scroll to the latest message when messages change.
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Start a direct call with the exchange partner.
+  function handleStartCall() {
+    if (!connected) {
+      setSocketError("Chat connection is not ready. Please reconnect.");
+      return;
+    }
+
+    if (partnerStatus !== "online") {
+      setSocketError("Your exchange partner is currently offline.");
+      return;
+    }
+
+    if (!exchangeId || !partner) return;
+
+    const callId =
+      globalThis.crypto?.randomUUID?.() ||
+      `call-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+    const callDetails = {
+      callId,
+      exchangeId,
+      callerName: "You",
+      receiverName: partner.name || "SkillSwap User",
+    };
+
+    try {
+      setSocketError("");
+      setOutgoingCall(callDetails);
+      chatSocket.startCall(exchangeId, callId);
+    } catch (err) {
+      setOutgoingCall(null);
+      setSocketError(err.message || "Could not start the call.");
+    }
+  }
 
   async function handleSendMessage(event) {
     event.preventDefault();
@@ -409,6 +460,20 @@ function ChatPage() {
               </span>
             </div>
           </div>
+
+          <button
+            type="button"
+            className="chat-call-button"
+            onClick={handleStartCall}
+            disabled={!connected || partnerStatus !== "online"}
+            title={
+              partnerStatus !== "online"
+                ? "Your partner must be online to call"
+                : "Start video call"
+            }
+          >
+            📹 Call
+          </button>
 
           {/* Partner Online / Offline Status */}
           <div className="chat-connection">

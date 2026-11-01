@@ -1,6 +1,7 @@
 
 import { Routes, Route } from "react-router-dom";
 
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -14,6 +15,8 @@ import MyProfile from "./pages/MyProfile";
 import ChatPage from "./pages/ChatPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import CallProvider from "./components/CallProvider";
+
 
 import "@livekit/components-styles";
 import "./App.css";
@@ -27,7 +30,7 @@ function NotFound() {
   );
 }
 
-function App() {
+function AppRoutes() {
   return (
     <Routes>
       {/* Home Page */}
@@ -87,7 +90,17 @@ function App() {
         }
       />
 
-      {/* Live Video Call */}
+      {/* Direct Video Call */}
+      <Route
+        path="/call/exchange/:exchangeId/:callId"
+        element={
+          <ProtectedRoute>
+            <VideoCall />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Existing Scheduled Video Call */}
       <Route
         path="/call/:sessionId"
         element={
@@ -100,6 +113,14 @@ function App() {
       {/* 404 Page */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+  );
+}
+
+function App() {
+  return (
+    <CallProvider>
+      <AppRoutes />
+    </CallProvider>
   );
 }
 

@@ -1,0 +1,125 @@
+
+.incoming-call-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.incoming-call-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 32px 26px;
+  text-align: center;
+  color: #ffffff;
+  background: #171923;
+  border: 1px solid #303448;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: incomingCallPop 0.3s ease-out;
+}
+
+.incoming-call-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 20px;
+  font-size: 34px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 50%;
+  animation: incomingCallPulse 1.5s infinite;
+}
+
+.incoming-call-card h2 {
+  margin: 0 0 10px;
+  font-size: 23px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.incoming-call-card p {
+  margin: 0 0 26px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #b8bdcc;
+}
+
+.incoming-call-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.incoming-call-actions button {
+  flex: 1;
+  min-height: 46px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.incoming-call-actions button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.accept-call-btn {
+  background: #16a34a;
+}
+
+.reject-call-btn {
+  background: #dc2626;
+}
+
+@keyframes incomingCallPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes incomingCallPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 16px rgba(99, 102, 241, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+@media (max-width: 480px) {
+  .incoming-call-card {
+    padding: 28px 20px;
+  }
+
+  .incoming-call-card h2 {
+    font-size: 20px;
+  }
+
+  .incoming-call-actions {
+    gap: 10px;
+  }
+}

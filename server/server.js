@@ -14,11 +14,13 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const callRoutes = require("./routes/callRoutes");
 
 // Models
 const User = require("./models/User");
 const ExchangeRequest = require("./models/ExchangeRequest");
 const Message = require("./models/Message");
+const Call = require("./models/Call");
 
 const app = express();
 const server = http.createServer(app);
@@ -40,7 +42,6 @@ const allowedOrigins = [
   "http://127.0.0.1:5174",
 ].filter(Boolean);
 
-// Validate frontend origin
 function isAllowedOrigin(origin) {
   if (!origin) return true;
 
@@ -48,7 +49,6 @@ function isAllowedOrigin(origin) {
     return true;
   }
 
-  // Allow SkillSwap Vercel preview deployments
   return /^https:\/\/skill-swap-[a-z0-9-]+\.vercel\.app$/i.test(origin);
 }
 
@@ -63,15 +63,11 @@ const corsOptions = {
   },
 
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-
   allowedHeaders: ["Content-Type", "Authorization"],
-
   optionsSuccessStatus: 204,
 };
 
-// Apply CORS before API routes
 app.use(cors(corsOptions));
-
 app.use(express.json({ limit: "10kb" }));
 
 // -----------------------------------------
@@ -96,6 +92,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/calls", callRoutes);
 
 // -----------------------------------------
 // WEBSOCKET CHAT SERVER
@@ -107,7 +104,6 @@ const wss = new WebSocketServer({
   maxPayload: 10 * 1024,
 });
 
-// Store active WebSocket connections
 const onlineUsers = new Map();
 const userWatchedExchanges = new Map();
 
@@ -222,7 +218,6 @@ wss.on("connection", (ws, request) => {
 
   ws.watchedExchanges = new Set();
 
-  // Validate browser origin
   const origin = request.headers.origin;
 
   if (!isAllowedOrigin(origin)) {
@@ -232,7 +227,6 @@ wss.on("connection", (ws, request) => {
 
   console.log("New WebSocket connection.");
 
-  // Require authentication within 10 seconds
   authTimeout = setTimeout(() => {
     if (!authenticatedUser) {
       sendWS(ws, {
@@ -299,7 +293,270 @@ wss.on("connection", (ws, request) => {
       }
 
       // ---------------------------------
-      // STEP 2: HANDLE CHAT EVENTS
+      // STEP 2: HANDLE CALL EVENTS
+      // ---------------------------------
+
+      // START CALL
+      if (payload.type === "CALL_START") {
+        const { exchangeId, callId } = payload;
+
+        if (
+          typeof exchangeId !== "string" ||
+          !mongoose.isValidObjectId(exchangeId) ||
+          typeof callId !== "string" ||
+          !/^[a-zA-Z0-9-]{10,100}$/.test(callId)
+        ) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "Invalid call details.",
+          });
+          return;
+        }
+
+        const exchange = await verifyChatAccess(exchangeId, authenticatedUser);
+
+        if (!exchange) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "Calls are allowed only for accepted exchanges.",
+          });
+          return;
+        }
+
+        const receiverId =
+          exchange.sender.toString() === authenticatedUser
+            ? exchange.receiver.toString()
+            : exchange.sender.toString();
+
+        if (!onlineUsers.has(receiverId)) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "User is currently offline.",
+          });
+          return;
+        }
+
+        const existingCall = await Call.findOne({
+          status: { $in: ["ringing", "accepted"] },
+          $or: [
+            { caller: authenticatedUser },
+            { receiver: authenticatedUser },
+            { caller: receiverId },
+            { receiver: receiverId },
+          ],
+        });
+
+        if (existingCall) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "One of the users is already in a call.",
+          });
+          return;
+        }
+
+        const caller = await User.findById(authenticatedUser)
+          .select("name")
+          .lean();
+
+        await Call.create({
+          callId,
+          exchangeRequest: exchange._id,
+          caller: authenticatedUser,
+          receiver: receiverId,
+          status: "ringing",
+        });
+
+        deliverMessage(receiverId, {
+          type: "INCOMING_CALL",
+          callId,
+          exchangeId,
+          caller: {
+            _id: authenticatedUser,
+            name: caller?.name || "SkillSwap User",
+          },
+        });
+
+        sendWS(ws, {
+          type: "CALL_RINGING",
+          callId,
+          exchangeId,
+          receiverId,
+        });
+
+        return;
+      }
+
+      // ACCEPT CALL
+      if (payload.type === "CALL_ACCEPT") {
+        const { callId } = payload;
+
+        const call = await Call.findOneAndUpdate(
+          {
+            callId,
+            receiver: authenticatedUser,
+            status: "ringing",
+          },
+          {
+            $set: {
+              status: "accepted",
+              acceptedAt: new Date(),
+            },
+          },
+          { new: true },
+        );
+
+        if (!call) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "Call is no longer available.",
+          });
+          return;
+        }
+
+        const callData = {
+          type: "CALL_ACCEPTED",
+          callId,
+          exchangeId: call.exchangeRequest.toString(),
+        };
+
+        deliverMessage(call.caller.toString(), callData);
+        sendWS(ws, callData);
+
+        return;
+      }
+
+      // REJECT CALL
+      if (payload.type === "CALL_REJECT") {
+        const { callId } = payload;
+
+        const call = await Call.findOneAndUpdate(
+          {
+            callId,
+            receiver: authenticatedUser,
+            status: "ringing",
+          },
+          {
+            $set: {
+              status: "rejected",
+              endedAt: new Date(),
+            },
+          },
+          { new: true },
+        );
+
+        if (!call) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "Call is no longer available.",
+          });
+          return;
+        }
+
+        deliverMessage(call.caller.toString(), {
+          type: "CALL_REJECTED",
+          callId,
+          exchangeId: call.exchangeRequest.toString(),
+        });
+
+        sendWS(ws, { type: "CALL_REJECTED", callId });
+
+        return;
+      }
+
+      // CANCEL CALL
+      if (payload.type === "CALL_CANCEL") {
+        const { callId } = payload;
+
+        const call = await Call.findOneAndUpdate(
+          {
+            callId,
+            caller: authenticatedUser,
+            status: "ringing",
+          },
+          {
+            $set: {
+              status: "cancelled",
+              endedAt: new Date(),
+            },
+          },
+          { new: true },
+        );
+
+        if (!call) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "Call cannot be cancelled.",
+          });
+          return;
+        }
+
+        deliverMessage(call.receiver.toString(), {
+          type: "CALL_CANCELLED",
+          callId,
+          exchangeId: call.exchangeRequest.toString(),
+        });
+
+        sendWS(ws, { type: "CALL_CANCELLED", callId });
+
+        return;
+      }
+
+      // END CALL
+      if (payload.type === "CALL_END") {
+        const { callId } = payload;
+
+        const call = await Call.findOneAndUpdate(
+          {
+            callId,
+            status: "accepted",
+            $or: [
+              { caller: authenticatedUser },
+              { receiver: authenticatedUser },
+            ],
+          },
+          {
+            $set: {
+              status: "ended",
+              endedAt: new Date(),
+            },
+          },
+          { new: true },
+        );
+
+        if (!call) {
+          sendWS(ws, {
+            type: "CALL_ERROR",
+            callId,
+            message: "Call is already ended or unavailable.",
+          });
+          return;
+        }
+
+        const otherUserId =
+          call.caller.toString() === authenticatedUser
+            ? call.receiver.toString()
+            : call.caller.toString();
+
+        deliverMessage(otherUserId, {
+          type: "CALL_ENDED",
+          callId,
+          exchangeId: call.exchangeRequest.toString(),
+        });
+
+        sendWS(ws, { type: "CALL_ENDED", callId });
+
+        return;
+      }
+
+      // ---------------------------------
+      // STEP 3: HANDLE CHAT EVENTS
       // ---------------------------------
 
       // WATCH CHAT
@@ -343,7 +600,6 @@ wss.on("connection", (ws, request) => {
             ? exchange.receiver.toString()
             : exchange.sender.toString();
 
-        // Send partner current presence
         sendWS(ws, {
           type: "PRESENCE_UPDATE",
           exchangeId,
@@ -351,7 +607,6 @@ wss.on("connection", (ws, request) => {
           status: onlineUsers.has(partnerId) ? "online" : "offline",
         });
 
-        // Notify partner
         await notifyPartnerPresence(exchangeId, authenticatedUser, "online");
 
         return;
@@ -470,10 +725,6 @@ wss.on("connection", (ws, request) => {
         return;
       }
 
-      // ---------------------------------
-      // VERIFY ACCEPTED EXCHANGE
-      // ---------------------------------
-
       const exchange = await verifyChatAccess(exchangeId, authenticatedUser);
 
       if (!exchange) {
@@ -485,17 +736,12 @@ wss.on("connection", (ws, request) => {
         return;
       }
 
-      // Determine receiver
       const senderId = authenticatedUser;
 
       const receiverId =
         exchange.sender.toString() === senderId
           ? exchange.receiver.toString()
           : exchange.sender.toString();
-
-      // ---------------------------------
-      // SAVE MESSAGE
-      // ---------------------------------
 
       const savedMessage = await Message.create({
         exchangeRequest: exchange._id,
@@ -515,10 +761,7 @@ wss.on("connection", (ws, request) => {
         message: populatedMessage,
       };
 
-      // Deliver message to receiver
       deliverMessage(receiverId, messageData);
-
-      // Confirm to sender
       deliverMessage(senderId, messageData);
     } catch (error) {
       console.error("WebSocket error:", error.message);
@@ -554,7 +797,6 @@ wss.on("connection", (ws, request) => {
     if (authenticatedUser) {
       removeUser(authenticatedUser, ws);
 
-      // Keep user online while another connection exists
       if (!onlineUsers.has(authenticatedUser)) {
         const watchedExchanges =
           userWatchedExchanges.get(authenticatedUser) || new Set();
